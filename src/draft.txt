@@ -1,0 +1,31 @@
+// console.log(data);
+// setEmailMsg("mooooo");
+// const name = data.data[0].value;
+// const email = data.data[0].value;
+// const nameValidity = parseName(name);
+// const emailValidity = parseEmail(email);
+// if (nameValidity === "OK") {
+//   setNameMsg("Success!");
+// } else {
+//   //nameValidity === "LEN_INVALID"
+//   setNameMsg(
+//     "You must enter a name that is between 1 and 255 characters long"
+//   );
+// }
+// if (emailValidity === "OK") {
+//   setEmailMsg("Success!");
+// } else {
+//   switch (emailValidity) {
+//     case "LEN_INVALID":
+//       setEmailMsg(
+//         "You must enter an email that is between 1 and 255 characters long"
+//       );
+//       break;
+//     case "FORMAT_INVALID":
+//       setEmailMsg("You must enter a valid email address");
+//   }
+// }
+// if (nameValidity === "OK" && emailValidity === "OK") {
+//   markFlowCompleted(FORM_ID);
+//   // setOpenFlowState(FORM_ID);
+// }

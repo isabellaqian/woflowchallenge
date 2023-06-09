@@ -1,0 +1,14 @@
+To test your ability to perform these tasks, we'd like you to write a small prototype application that implements a custom onboarding flow using Frigade (https://frigade.com/).
+Create an app that use Frigade to create a custom onboarding flow that includes 3 different screens:
+    A welcome screen
+    A second screen that asks for user's name and email address
+    A third screen that shows a thank you message, and any additional helpful message that may be relevant for the user experience
+On the second screen, implement **simple validation** to ensure that the user has inputted a valid name and email address
+    Some examples could be email should be in valid format, and validate name to be less than 255 characters, etc
+Prototype or explain the necessary tests. This will need to handle the happy path as well as edge conditions.
+Feel free to ask any clarifying questions, read the Frigade documentations (https://docs.frigade.com/overview/how-frigade-works), build on top of any app (such as https://create-react-app.dev/docs/getting-started/) or prototype your solution with appropriate amount of comments/explanation.
+
+What we measure:
+Understanding of the product requirements: does your solution address what's being asked?
+Quality of the code: the ability to think through edge conditions, follow best coding practices as much as possible
+Ability to read through documentations, if there's any assumption that needs to be made, please explain.

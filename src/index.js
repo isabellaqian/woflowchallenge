@@ -1,13 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { FrigadeProvider } from "@frigade/react";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <FrigadeProvider
+      publicApiKey="api_public_R9LR2H8xvtKrYfbmWFKE6qeZo0ROTieHnY9yQVoRI0WmqV7rJqWhHEDp3IC21ia3"
+      userId="my-user-id"
+    >
+      <App />
+    </FrigadeProvider>
   </React.StrictMode>
 );
 
