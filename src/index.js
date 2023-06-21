@@ -10,7 +10,18 @@ root.render(
   <React.StrictMode>
     <FrigadeProvider
       publicApiKey="api_public_R9LR2H8xvtKrYfbmWFKE6qeZo0ROTieHnY9yQVoRI0WmqV7rJqWhHEDp3IC21ia3"
-      userId="my-user-id"
+      userId="user1"
+      config={{
+        defaultAppearance: {
+          theme: {
+            // colorText: "#3d3d3d",
+            // colorTextSecondary: "#494949",
+            // colorTextOnPrimaryBackground: "#fff",
+            colorPrimary: "#4D61FF",
+            // colorBorder: "#E2E2E2",
+          },
+        },
+      }}
     >
       <App />
     </FrigadeProvider>

@@ -4,18 +4,17 @@ import {
   FrigadeForm,
   useFlows,
   useFlowOpens,
+  useUser,
 } from "@frigade/react";
 import React, { useEffect, useState } from "react";
+import Popup from "./Popup.js";
 
 const MAX_STRING_LEN = 255;
 
 function App() {
-  const [nameMsg, setNameMsg] = useState(""); //the message that displays on a user's screen when they submit their name
-  const [emailMsg, setEmailMsg] = useState(""); //the message that displays on a user's screen when they submit their email
-
-  const FORM_ID = "flow_PLTYgrMBKsLFGQE4";
   const CHECKLIST_ID = "flow_kVvTD3OY6MlvTxJl";
   const { setOpenFlowState } = useFlowOpens();
+  const { addPropertiesToUser } = useUser();
   const {
     getFlowStatus,
     getStepStatus,
@@ -25,108 +24,55 @@ function App() {
     markStepCompleted,
   } = useFlows();
 
-  const handleEmail = () => {
-    // check from data for the email
-    // check email string for validity
-    // update user flow to completed if it's valid
+  const [dialog, setDialog] = useState(false);
+  const [inputSuccess, setInputSuccess] = useState([]);
+
+  useEffect(() => {
+    if (
+      getStepStatus(CHECKLIST_ID, "introduction") === "COMPLETED_STEP" &&
+      inputSuccess.length === 0
+    ) {
+      setDialog(true);
+    }
+  });
+
+  function toggleDialog() {
+    setDialog(!dialog);
+  }
+  function setSuccess(name, email) {
+    console.log("set success, ", name);
+    setInputSuccess([name, email]);
+    markFlowNotStarted(CHECKLIST_ID); //need to reset
+    //send data to frigade
+    //working curl command:
+    // curl --request POST \
+    // --url https://api.frigade.com/v1/public/flowResponses \
+    // -H 'Content-Type: application/json' --header 'Authorization: Bearer api_public_R9LR2H8xvtKrYfbmWFKE6qeZo0ROTieHnY9yQVoRI0WmqV7rJqWhHEDp3IC21ia3' -d '{ "flowSlug": "flow_kVvTD3OY6MlvTxJl", "foreignUserId": "user1", "actionType": "COMPLETED_STEP", "stepId": "email", "createdAt": "2023-06-17T01:32:00Z", "data": "{\"field\": \"testing\"}"}'
     fetch("https://api.frigade.com/v1/public/flowResponses", {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Authorization:
           "Bearer api_public_R9LR2H8xvtKrYfbmWFKE6qeZo0ROTieHnY9yQVoRI0WmqV7rJqWhHEDp3IC21ia3",
       },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setEmailMsg("mooooo");
-        const name = data.data[0].value;
-        const email = data.data[0].value;
-        const nameValidity = parseName(name);
-        const emailValidity = parseEmail(email);
-        if (nameValidity === "OK") {
-          setNameMsg("Success!");
-        } else {
-          //nameValidity === "LEN_INVALID"
-          setNameMsg(
-            "You must enter a name that is between 1 and 255 characters long"
-          );
-        }
-        if (emailValidity === "OK") {
-          setEmailMsg("Success!");
-        } else {
-          switch (emailValidity) {
-            case "LEN_INVALID":
-              setEmailMsg(
-                "You must enter an email that is between 1 and 255 characters long"
-              );
-              break;
-            case "FORMAT_INVALID":
-              setEmailMsg("You must enter a valid email address");
-          }
-        }
-        if (nameValidity === "OK" && emailValidity === "OK") {
-          markStepCompleted(CHECKLIST_ID, "email");
-          markFlowCompleted(FORM_ID);
-          // setOpenFlowState(FORM_ID);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
-
-  const parseEmail = (email) => {
-    //checks: 255 char or less, contains @ and . after, valid printable characters
-    const regex = /^[\x20-\x7E]*$/;
-    if (!regex.test(email)) {
-      //check that all characters are printable, eg. not "\n"
-      return "CHAR_INVALID";
-    }
-    if (email.length > MAX_STRING_LEN) {
-      //check length
-      return "LEN_INVALID";
-    }
-    if (!email.includes("@")) {
-      return "NO_AT";
-    }
-    const clippedEmail = email.split("@"); //check there is @ and a . afterwards
-    if (clippedEmail.length === 2) {
-      if (clippedEmail[0].length > 0 && clippedEmail[1].includes(".")) {
-        return "OK";
-      }
-    }
-    return "FORMAT_INVALID";
-  };
-  const parseName = (name) => {
-    //checks: 255 char or less
-    const regex = /^[\x20-\x7E]*$/;
-    if (!regex.test(name)) {
-      //check that all characters are printable, eg. not "\n"
-      return "CHAR_INVALID";
-    }
-
-    return name.length > 0 && name.length < MAX_STRING_LEN
-      ? "OK"
-      : "LEN_INVALID";
-  };
+      body: JSON.stringify({
+        flowSlug: "flow_kVvTD3OY6MlvTxJl",
+        foreignUserId: "user1", //TODO: replace with actual user id using localstorage
+        actionType: "COMPLETED_STEP",
+        stepId: "email",
+        createdAt: new Date().toISOString(),
+        data: "name: " + name + ", email: " + email,
+      }),
+    }).then((response) => {
+      console.log(response);
+    });
+    markStepCompleted(CHECKLIST_ID, "email");
+    markStepCompleted(CHECKLIST_ID, "introduction");
+  }
 
   return (
     <div className="App container">
-      {getStepStatus(CHECKLIST_ID, "introduction") === "COMPLETED_STEP" && (
-        <FrigadeForm
-          flowId={FORM_ID}
-          type="large-modal"
-          customVariables={{
-            nameMsg: nameMsg,
-            emailMsg: emailMsg,
-          }}
-          onButtonClick={(step: StepData) => {
-            console.log(step);
-            handleEmail();
-          }}
-        />
-      )}
+      <Popup open={dialog} handleClose={toggleDialog} setSuccess={setSuccess} />
       <FrigadeChecklist
         flowId={CHECKLIST_ID}
         title="Getting Started"
@@ -134,7 +80,6 @@ function App() {
         appearance={{
           styleOverrides: {
             button: {
-              // "align-items": "center",
               marginInline: "auto",
             },
           },
@@ -142,7 +87,7 @@ function App() {
       />
       <button
         onClick={() => {
-          markFlowNotStarted(FORM_ID);
+          // markFlowNotStarted(FORM_ID);
           markFlowNotStarted(CHECKLIST_ID);
         }}
       >
